@@ -1,0 +1,24 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+    <springProperty scope="context" name="serviceName" source="spring.application.name" />
+
+    <if condition='isDefined("ENCODE_FOR_LOGSTASH")'>
+        <then>
+            <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                    <includeContext>false</includeContext>
+                    <customFields>{"annotation": {"name": "${serviceName}"}}</customFields>
+                    <includeMdcKeyName>X-Correlation-Id</includeMdcKeyName>
+                </encoder>
+            </appender>
+        </then>
+        <else>
+            <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+        </else>
+    </if>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>

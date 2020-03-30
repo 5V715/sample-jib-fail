@@ -1,0 +1,73 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.71'
+    id "org.jetbrains.kotlin.plugin.spring" version '1.3.71'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'com.google.cloud.tools.jib' version '2.1.0'
+    id 'org.springframework.boot' version '2.2.6.RELEASE'
+    id "org.jlleitschuh.gradle.ktlint" version '9.2.1'
+}
+
+group 'sample-jib-fail'
+version '0.0.1'
+
+repositories {
+    jcenter()
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url = 'https://repo.spring.io/milestone'
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'io.projectreactor:reactor-bom:Dysprosium-SR6'
+        mavenBom 'io.r2dbc:r2dbc-bom:Arabba-SR3'
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.data:spring-data-r2dbc:1.0.0.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'io.projectreactor.kotlin:reactor-kotlin-extensions:1.0.2.RELEASE'
+    implementation 'io.projectreactor.addons:reactor-extra:3.3.2.RELEASE'
+    implementation 'io.r2dbc:r2dbc-postgresql'
+    implementation 'io.r2dbc:r2dbc-pool'
+    implementation 'com.github.davidmoten:geo:0.7.7'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.10.1'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'net.logstash.logback:logstash-logback-encoder:6.3'
+    implementation 'org.codehaus.janino:janino:3.1.0'
+    implementation 'io.arrow-kt:arrow-core:0.10.4'
+
+    // Update jjwt and remove jaxb when DEV has a more secure key with proper key length
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    runtime 'javax.xml.bind:jaxb-api:2.3.0'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'com.squareup.okhttp3:okhttp:4.3.1'
+    testImplementation 'com.squareup.okhttp3:okhttp-sse:4.3.1'
+    testImplementation 'io.mockk:mockk:1.9.3.kotlin12'
+    testImplementation 'com.ninja-squad:springmockk:2.0.0'
+    testImplementation 'io.strikt:strikt-core:0.24.0'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+jib {
+    from.image = 'openjdk:11-jre-slim'
+    to {
+        image = project.name
+        tags = [project.version]
+    }
+}
